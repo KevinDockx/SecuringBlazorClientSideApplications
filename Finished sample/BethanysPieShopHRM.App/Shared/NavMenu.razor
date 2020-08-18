@@ -1,0 +1,83 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject IAccessTokenProvider TokenProvider
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<div class="bg-light" id="sidebar-wrapper">
+    <div class="sidebar-logo">
+        <img class="img-responsive" id="logo" src="images/bethanylogo-new.png" />
+    </div>
+    <div class="profile">
+        <div class="profile-bg">
+            <img class="img-responsive" src="images/profilePicture.jpg" />
+        </div>
+        <div class="profile-picture">
+            <img class="img-responsive circle account-photo" src="images/profilePicture.jpg" />
+        </div>
+    </div>
+    <div class="menu list-group list-group-flush">
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="list-group-item list-group-item-action bg-light" href="/"
+                         Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Policy="@BethanysPieShopHRM.Shared.Policies.CanManageEmployees">
+            <NavLink class="list-group-item list-group-item-action bg-light" href="/employeeoverview">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Employees
+            </NavLink>
+        </AuthorizeView>
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="list-group-item list-group-item-action bg-light"
+                         href="/employeeedit">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Add new employee
+                </NavLink>
+                <button class="list-group-item list-group-item-action bg-light"
+                        @onclick="BeginSignOut">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Log out
+                    (@context.User.Identity.Name)
+                </button>
+
+                <button class="list-group-item list-group-item-action bg-light"
+                        @onclick="WriteToken">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Write token
+                </button>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="list-group-item list-group-item-action bg-light"
+                         href="authentication/login">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Log in
+                </NavLink>
+                <NavLink class="list-group-item list-group-item-action bg-light"
+                         href="https://localhost:44333/Identity/Account/Register">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Register
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+
+    </div>
+</div>
+
+
+@code{
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+
+    private async Task WriteToken()
+    {        
+        var tokenResult = await TokenProvider.RequestAccessToken();
+        if (tokenResult.TryGetToken(out var token))
+        {
+            System.Diagnostics.Debug.WriteLine(token.Value);
+        }
+    }
+
+}
