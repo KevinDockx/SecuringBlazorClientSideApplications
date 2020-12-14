@@ -1,6 +1,5 @@
 ﻿@page "/employeeoverview"
-@attribute [Microsoft.AspNetCore.Authorization.Authorize
-   (Policy = BethanysPieShopHRM.Shared.Policies.CanManageEmployees)]
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = BethanysPieShopHRM.Shared.Policies.CanManageEmployees)]
 
 <h1 class="page-title">All employees</h1>
 
